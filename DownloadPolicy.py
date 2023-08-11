@@ -34,6 +34,12 @@ def get_versions():
 
     return df
 
+def get_latest_version(df):
+    channels = df['Channel'].unique()
+    latest_versions = {}
+    for c in channels:
+        latest_versions[c] = df[df['Channel'] == c]['Version'].max()
+    return latest_versions
 
 def download_version(selected_version, df):
     # DataFrameから選択したバージョンのポリシーテンプレートのURLを取得
@@ -75,3 +81,14 @@ def extract_zip(zip_filename, path="policy"):
     with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
         zip_ref.extractall(path)
 
+if __name__ == "__main__":
+    # 使用例
+    df = get_versions()
+    cab_filename = download_version('115.0.1901.200', df)
+    zip_filename = extract_cab(cab_filename)
+    if zip_filename:
+        extract_zip(zip_filename)
+        # cab と zip ファイルを削除
+        os.remove(cab_filename)
+        os.remove(zip_filename)
+    print(get_latest_version(df))
