@@ -42,8 +42,8 @@ def is_admin():
 
 
 def copy_files_to_policy_dir(src_path=r"policy/windows/admx"):
-    # dest_path = "C:\\Windows\\PolicyDefinitions"
-    dest_path = "C:\\temp\\PolicyDefinitions"
+    dest_path = "C:\\Windows\\PolicyDefinitions"
+    # dest_path = "C:\\temp\\PolicyDefinitions"
 
     for item in os.listdir(src_path):
         src_item = os.path.join(src_path, item)
