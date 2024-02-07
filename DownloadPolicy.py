@@ -9,9 +9,15 @@ import js2py
 
 
 def get_versions():
-    url = "https://www.microsoft.com/ja-jp/edge/business/download"
-    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.36"
-    response = requests.get(url, allow_redirects=True, headers={"User-Agent": ua})
+    url = "https://www.microsoft.com/ja-jp/edge/business/download?form=MA13FJ"
+    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0"
+    response = requests.get(url, allow_redirects=True,
+                            headers={
+                                "User-Agent": ua,
+                                'Accept-Language': 'ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+                                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                            },
+                            timeout=10)
     soup = BeautifulSoup(response.content, 'html.parser', from_encoding='utf-8')
 
     # window.__NUXT__ のデータを取得
@@ -84,7 +90,7 @@ def extract_zip(zip_filename, path="policy"):
 if __name__ == "__main__":
     # 使用例
     df = get_versions()
-    cab_filename = download_version('115.0.1901.200', df)
+    cab_filename = download_version('121.0.2277.106', df)
     zip_filename = extract_cab(cab_filename)
     if zip_filename:
         extract_zip(zip_filename)
