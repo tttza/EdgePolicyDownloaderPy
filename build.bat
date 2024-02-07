@@ -1,1 +1,1 @@
- pyinstaller --onefile --uac-admin main.py
+ pyinstaller --onefile --uac-admin -F main.py -n EdgePolicyDownloaderPy

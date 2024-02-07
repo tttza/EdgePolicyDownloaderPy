@@ -17,10 +17,10 @@ def display_versions_and_choose(df):
     # ユーザーに選択させる
     indexes = list(df.index)
     versions = list(df['Version'])
-    print("キャンセルするには 'c' と入力してください。")
+    print("To cancel, type 'c'.")
     chosen_input = ""
     while True:
-        chosen_input = input("インデックス または バージョン文字列 を入力してください（Default: 最新Stable）：")
+        chosen_input = input("Enter index or version string (Default: Latest Stable):")
         chosen_input = chosen_input.strip()
         if chosen_input == 'c':
             return None
@@ -52,7 +52,7 @@ def copy_files_to_policy_dir(src_path=r"policy/windows/admx"):
         # ファイルの場合
         if os.path.isfile(src_item):
             shutil.copy2(src_item, dest_item)
-            print(f"{item} を {dest_path} にコピーしました。")
+            print(f"{item} copied to {dest_path}.")
         # ディレクトリの場合
         elif os.path.isdir(src_item):
             if not os.path.exists(dest_item):  # ディレクトリが存在しない場合、新しく作成
@@ -62,14 +62,14 @@ def copy_files_to_policy_dir(src_path=r"policy/windows/admx"):
                 dest_sub_item = os.path.join(dest_item, sub_item)
                 if os.path.isfile(src_sub_item):
                     shutil.copy2(src_sub_item, dest_sub_item)
-            print(f"{item} ディレクトリの内容を {dest_path} にコピーしました。")
+            print(f"Contents of {item} directory copied to {dest_path}")
 
 
 if __name__ == "__main__":
     try:
         # 管理者権限の確認
         if not is_admin():
-            print("この操作を行うには管理者権限が必要です。")
+            print("Administrative privileges are required to perform this operation.")
 
             # # UACプロンプトを表示して管理者権限でスクリプトを再実行
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
@@ -83,11 +83,11 @@ if __name__ == "__main__":
         print("Version:", selected_version)
 
         if not selected_version:
-            print("操作がキャンセルされました。")
-            input("Enterキーを押して終了してください。")
+            print("Operation canceled.")
+            input("Press Enter to exit.")
             exit(0)
 
-        print("ダウンロード中...\n")
+        print("Downloading...\n")
         cab_filename = DP.download_version(selected_version, df)
         zip_filename = DP.extract_cab(cab_filename)
         if zip_filename:
@@ -101,9 +101,9 @@ if __name__ == "__main__":
             copy_files_to_policy_dir()
 
         print()
-        input("Enterキーを押して終了してください。")
+        input("Press Enter to exit.")
 
     except Exception as e:
         print()
         print(e)
-        input("Enterキーを押して終了してください。")
+        input("Press Enter to exit.")

@@ -17,7 +17,7 @@ def get_versions():
                                 'Accept-Language': 'ja,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
                                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                             },
-                            timeout=10)
+                            timeout=30)
     soup = BeautifulSoup(response.content, 'html.parser', from_encoding='utf-8')
 
     # window.__NUXT__ のデータを取得
@@ -59,7 +59,7 @@ def download_version(selected_version, df):
     with open(filename, 'wb') as file:
         file.write(response.content)
 
-    print(f"{filename} をダウンロードしました。")
+    print(f"{filename} downloaded.")
     return filename
 
 
