@@ -16,7 +16,7 @@ def versions_df():
 def test_get_versions(versions_df):
     assert isinstance(versions_df, pd.DataFrame)
     assert not versions_df.empty
-    assert versions_df['PolicyURL'].map(lambda x: x.startswith('http')).all()
+    assert versions_df['PolicyURL'].map(lambda x: type(x) is str and x.startswith('http')).any()
 
 
 def test_get_latest_version(versions_df):

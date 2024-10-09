@@ -10,7 +10,7 @@ import js2py
 
 def get_versions():
     url = "https://www.microsoft.com/ja-jp/edge/business/download?form=MA13FJ"
-    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36 Edg/121.0.0.0"
+    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0"
     response = requests.get(url, allow_redirects=True,
                             headers={
                                 "User-Agent": ua,
@@ -20,23 +20,32 @@ def get_versions():
                             timeout=30)
     soup = BeautifulSoup(response.content, 'html.parser', from_encoding='utf-8')
 
-    # window.__NUXT__ のデータを取得
-    nuxt_data_script = soup.find("script", text=lambda t: t and "window.__NUXT__" in t).text
+    nuxt_data_script = soup.find("script", id="__NUXT_DATA__").text
     policy_data = js2py.eval_js(nuxt_data_script).to_dict()
 
-    major_releases_data = policy_data['fetch']['block-enterprise-downloads:0']['majorReleases']
-
-    # データをDataFrameに変換
     df_list = []
-    for major_release in major_releases_data:
-        channel = major_release.get('channelId')
-        releases = major_release.get('releases', [])
-        for release in releases:
-            version = release.get('fullVersion')
-            policy_url = release.get('policyUrl')
-            df_list.append({'Version': version, 'Channel': channel, 'PolicyURL': policy_url})
+    for k in policy_data.keys():
+        if type(policy_data[k]) == dict:
+            if 'fullVersion' in policy_data[k].keys():
+                full_version = policy_data[str(policy_data[k]['fullVersion'])]
+                policy_url = policy_data[str(policy_data[k]['policyUrl'])]
+                df_list.append({'Version': full_version, 'PolicyURL': policy_url})
 
-    df = pd.DataFrame(df_list)
+    df = pd.DataFrame(df_list).sort_values('Version', ascending=False).reset_index(drop=True)
+    
+    df['MajorVersion'] = df['Version'].str.split('.').str[0].astype(int)
+    canary_major_version = df['MajorVersion'].max()
+
+    def _classify_channel(major_version):
+        if major_version == canary_major_version:
+            return 'canary'
+        elif major_version == canary_major_version - 1:
+            return 'beta'
+        else:
+            return 'stable'
+
+    df['Channel'] = df['MajorVersion'].apply(_classify_channel)
+    del df['MajorVersion']
 
     return df
 
@@ -90,7 +99,7 @@ def extract_zip(zip_filename, path="policy"):
 if __name__ == "__main__":
     # 使用例
     df = get_versions()
-    cab_filename = download_version('121.0.2277.106', df)
+    cab_filename = download_version('129.0.2792.79', df)
     zip_filename = extract_cab(cab_filename)
     if zip_filename:
         extract_zip(zip_filename)
