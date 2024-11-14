@@ -10,7 +10,7 @@ import js2py
 
 def get_versions():
     url = "https://www.microsoft.com/ja-jp/edge/business/download?form=MA13FJ"
-    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0"
+    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0"
     response = requests.get(url, allow_redirects=True,
                             headers={
                                 "User-Agent": ua,
@@ -27,9 +27,12 @@ def get_versions():
     for k in policy_data.keys():
         if type(policy_data[k]) == dict:
             if 'fullVersion' in policy_data[k].keys():
-                full_version = policy_data[str(policy_data[k]['fullVersion'])]
-                policy_url = policy_data[str(policy_data[k]['policyUrl'])]
-                df_list.append({'Version': full_version, 'PolicyURL': policy_url})
+                try:
+                    full_version = policy_data[str(policy_data[k]['fullVersion'])]
+                    policy_url = policy_data[str(policy_data[k]['policyUrl'])]
+                    df_list.append({'Version': full_version, 'PolicyURL': policy_url})
+                except Exception as e:
+                    print(e)
 
     df = pd.DataFrame(df_list).sort_values('Version', ascending=False).reset_index(drop=True)
     
